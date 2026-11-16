@@ -1133,6 +1133,46 @@ def guard_report(record: DomainRecord, context: Mapping[str, Any] | None = None)
     return {'passed': sum(item[0] for item in results), 'failed': sum(not item[0] for item in results),
             'messages': [item[1] for item in results]}
 
+def diagnostic_guard(record: DomainRecord, context: Mapping[str, Any]) -> tuple[str, tuple[str, ...]]:
+    """Return a conservative outcome override derived from the shared diagnosis.
+
+    When no stratified diagnosis is present in the context the engine behaves
+    exactly as before. When a diagnosis is present:
+
+    * a record whose region or user-group stratum lacks trustworthy
+      observations cannot be approved or rejected on evidence — it is held for
+      review and the missing evidence is named explicitly;
+    * a record in a trusted but vulnerable stratum is not allowed to be
+      approved, so the overall mean can no longer hide persistent misses.
+    """
+    diagnosis = context.get('_stratified_diagnosis')
+    if diagnosis is None:
+        return '', ()
+    trust = context.get('_record_stratum_trust') or {}
+    untrusted = [
+        f"{dimension}:{item['key']}({'; '.join(item['reasons']) or 'untrusted'})"
+        for dimension, item in trust.items()
+        if not item.get('trusted', False)
+    ]
+    if untrusted:
+        return 'review', (
+            "diagnostic_guard=insufficient_evidence:" + "|".join(untrusted),
+        )
+    vulnerable = {
+        (entry['dimension'], entry['key']) for entry in getattr(diagnosis, 'vulnerable_strata', [])
+    }
+    strata = context.get('_record_strata') or {}
+    matches = [
+        f"{dimension}:{key}" for dimension, key in strata.items()
+        if (dimension, key) in vulnerable
+    ]
+    if matches:
+        return 'review', (
+            "diagnostic_guard=vulnerable_stratum:" + "|".join(matches),
+        )
+    return '', ()
+
+
 def decide(record: DomainRecord, context: Mapping[str, Any] | None = None) -> Decision:
     context = context or {}
     rules = evaluate(record, context)
@@ -1140,6 +1180,7 @@ def decide(record: DomainRecord, context: Mapping[str, Any] | None = None) -> De
     guards = guard_report(record, context)
     effective_score = scorecard['score'] * (1.0 - float(context.get('domain_signal', 0.0)) * 0.45)
     critical = sum(item.severity == 'critical' for item in rules)
+    override, diagnostic_reasons = diagnostic_guard(record, context)
     if context.get('domain_severity') == 'critical':
         outcome = 'hold'
     elif critical:
@@ -1150,8 +1191,16 @@ def decide(record: DomainRecord, context: Mapping[str, Any] | None = None) -> De
         outcome = 'review'
     else:
         outcome = 'reject'
+    if override:
+        # The guard only prevents conclusions that the evidence cannot carry
+        # (approve/reject). A critical-rule 'hold' is already fail-closed and is
+        # never weakened, even when the stratum lacks trustworthy observations.
+        if outcome in ('approve', 'reject'):
+            outcome = override
     reasons = (f"score={scorecard['score']:.6f}", f"critical={critical}",
                f"guards={guards['passed']}/{guards['passed'] + guards['failed']}")
+    if diagnostic_reasons:
+        reasons = reasons + tuple(diagnostic_reasons)
     return Decision(record.record_id, outcome, effective_score, reasons, rules, scorecard['metrics'])
 
 def advance_for_outcome(record: DomainRecord, decision: Decision) -> DomainRecord:

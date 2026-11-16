@@ -11,6 +11,11 @@ from public_service_sla.reports.sla_report import export_bundle, verify_bundle
 from public_service_sla.capacity.load_replay import derive_context
 
 from public_service_sla.sla_signal.sla_pressure import augment_context
+from public_service_sla.diagnostics.stratified_diagnostics import (
+    diagnose_records,
+    strata_for_record,
+    trusted_strata_for_record,
+)
 
 class Application:
     def __init__(self, database: str | Path, context: Mapping[str, Any] | None = None):
@@ -29,11 +34,15 @@ class Application:
         self.repository.save_record(replacement, expected_version=current.version)
         return replacement
 
-    def process(self, record: DomainRecord) -> tuple[DomainRecord, Decision]:
+    def process(self, record: DomainRecord, diagnosis: Any = None) -> tuple[DomainRecord, Decision]:
         stored = self.ingest(record)
         context = dict(self.context)
         context.update(derive_context(stored, self.repository))
         context.update(augment_context(stored, self.repository))
+        if diagnosis is not None:
+            context["_stratified_diagnosis"] = diagnosis
+            context["_record_strata"] = strata_for_record(stored)
+            context["_record_stratum_trust"] = trusted_strata_for_record(stored, diagnosis)
         decision = decide(stored, context)
         self.repository.save_decision(decision)
         advanced = advance_for_outcome(stored, decision)
@@ -48,16 +57,18 @@ class Application:
         completed = self.repository.completed_run(run_id)
         if completed is not None:
             return completed
+        diagnosis = diagnose_records(records, self.context)
         decisions: dict[str, Decision] = {}
         final_records: list[DomainRecord] = []
         for record in records:
-            final_record, decision = self.process(record)
+            final_record, decision = self.process(record, diagnosis)
             final_records.append(final_record)
             decisions[record.record_id] = decision
         snapshot = self.repository.snapshot()
         if snapshot["chain_errors"]:
             raise ContractError("audit chain verification failed")
-        manifest = export_bundle(output, final_records, decisions, snapshot, self.repository.event_rows())
+        manifest = export_bundle(output, final_records, decisions, snapshot,
+                                 self.repository.event_rows(), diagnosis)
         result = {"run_id": run_id, "fixture_hash": fixture_hash, "records": len(final_records),
                   "decisions": len(decisions), "manifest": manifest, "snapshot": snapshot}
         self.repository.finish_run(run_id, result)
