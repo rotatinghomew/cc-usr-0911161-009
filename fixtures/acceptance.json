@@ -1,0 +1,158 @@
+{
+  "scenario": "国际人工智能公共产品服务水平观测台",
+  "synthetic": true,
+  "records": [
+    {
+      "record_id": "service_window-001",
+      "payload": {
+        "service_id": "service_id-0",
+        "region_code": "region_code-1",
+        "access_tier": "access_tier-2",
+        "user_group": "user_group-3",
+        "response_ms": 19.6,
+        "request_queue": 21.5,
+        "resource_load": 0.91,
+        "error_rate": 25.3,
+        "support_status": "support_status-3",
+        "capacity_units": 29.1,
+        "priority": 31.0,
+        "event_sequence": 32.9
+      },
+      "ledger": "onboarded",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "service_window-002",
+      "payload": {
+        "service_id": "service_id-1",
+        "region_code": "region_code-2",
+        "access_tier": "access_tier-3",
+        "user_group": "user_group-4",
+        "response_ms": 23.3,
+        "request_queue": 25.2,
+        "resource_load": 0.25,
+        "error_rate": 29.0,
+        "support_status": "support_status-4",
+        "capacity_units": 32.8,
+        "priority": 34.7,
+        "event_sequence": 36.6
+      },
+      "ledger": "onboarded",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "service_window-003",
+      "payload": {
+        "service_id": "service_id-2",
+        "region_code": "region_code-3",
+        "access_tier": "access_tier-4",
+        "user_group": "user_group-0",
+        "response_ms": 27.0,
+        "request_queue": 28.9,
+        "resource_load": 0.36,
+        "error_rate": 32.7,
+        "support_status": "support_status-0",
+        "capacity_units": 36.5,
+        "priority": 38.4,
+        "event_sequence": 40.3
+      },
+      "ledger": "onboarded",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "service_window-004",
+      "payload": {
+        "service_id": "service_id-3",
+        "region_code": "region_code-4",
+        "access_tier": "access_tier-0",
+        "user_group": "user_group-1",
+        "response_ms": 30.7,
+        "request_queue": 32.6,
+        "resource_load": 0.47,
+        "error_rate": 36.4,
+        "support_status": "support_status-1",
+        "capacity_units": 40.2,
+        "priority": 42.1,
+        "event_sequence": 44.0
+      },
+      "ledger": "onboarded",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "service_window-005",
+      "payload": {
+        "service_id": "service_id-4",
+        "region_code": "region_code-0",
+        "access_tier": "access_tier-1",
+        "user_group": "user_group-2",
+        "response_ms": 34.4,
+        "request_queue": 36.3,
+        "resource_load": 0.58,
+        "error_rate": 40.1,
+        "support_status": "support_status-2",
+        "capacity_units": 43.9,
+        "priority": 45.8,
+        "event_sequence": 47.7
+      },
+      "ledger": "onboarded",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "service_window-006",
+      "payload": {
+        "service_id": "service_id-0",
+        "region_code": "region_code-1",
+        "access_tier": "access_tier-2",
+        "user_group": "user_group-3",
+        "response_ms": 38.1,
+        "request_queue": 40.0,
+        "resource_load": 0.69,
+        "error_rate": 43.8,
+        "support_status": "support_status-3",
+        "capacity_units": 47.6,
+        "priority": 49.5,
+        "event_sequence": 51.4
+      },
+      "ledger": "onboarded",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "service_window-007",
+      "payload": {
+        "service_id": "service_id-1",
+        "region_code": "region_code-2",
+        "access_tier": "access_tier-3",
+        "user_group": "user_group-4",
+        "response_ms": 41.8,
+        "request_queue": 43.7,
+        "resource_load": 0.8,
+        "error_rate": 47.5,
+        "support_status": "support_status-4",
+        "capacity_units": 51.3,
+        "priority": 53.2,
+        "event_sequence": 55.1
+      },
+      "ledger": "onboarded",
+      "source": "synthetic-local-acceptance"
+    },
+    {
+      "record_id": "service_window-008",
+      "payload": {
+        "service_id": "service_id-2",
+        "region_code": "region_code-3",
+        "access_tier": "access_tier-4",
+        "user_group": "user_group-0",
+        "response_ms": 45.5,
+        "request_queue": 47.4,
+        "resource_load": 0.91,
+        "error_rate": 51.2,
+        "support_status": "support_status-0",
+        "capacity_units": 55.0,
+        "priority": 56.9,
+        "event_sequence": 58.8
+      },
+      "ledger": "onboarded",
+      "source": "synthetic-local-acceptance"
+    }
+  ]
+}
